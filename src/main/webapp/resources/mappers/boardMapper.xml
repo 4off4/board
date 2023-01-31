@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.board.mappers.board">
+	<!-- 게시판 목록 -->
+	<select id="list" resultType="com.board.domain.BoardDTO">
+	 	SELECT 
+	 		SEQ, SUBJECT, CONTENT, NAME, REG_DATE, READCOUNT
+		FROM 
+ 			BOARD
+ 		ORDER BY SEQ DESC
+	</select>
+	
+	<!-- 게시물 작성 -->
+	<insert id="write" parameterType="com.board.domain.BoardDTO">
+		INSERT INTO 
+	  	BOARD(SEQ, SUBJECT, NAME, CONTENT, REG_DATE)
+	   	VALUES(BOARD_SEQ.NEXTVAL, #{subject}, #{name}, #{content}, SYSDATE)
+	</insert>
+	
+	<!-- 게시물 조회 -->
+	<select id="view" parameterType="int" resultType="com.board.domain.BoardDTO">
+		SELECT		 		 
+			SEQ, SUBJECT, CONTENT, NAME, REG_DATE, READCOUNT
+		FROM 
+ 			BOARD
+		WHERE
+		 seq = #{seq}
+	</select>
+
+	<!-- 게시물 수정 -->
+	<update id="modify" parameterType="com.board.domain.BoardDTO" >
+		UPDATE BOARD 
+		SET 
+		    SUBJECT = #{subject},
+		    CONTENT = #{content}
+		WHERE SEQ = #{seq}
+	</update>
+	
+	<!-- 게시물 삭제 -->
+	<!-- 게시물 번호를 키값으로 삭제하기 때문에 파람타입은 int이다. -->
+	<delete id="delete" parameterType="int">
+		DELETE FROM BOARD 
+		WHERE SEQ = #{seq}
+	</delete>
+
+
+	<!-- 게시물 총 개수 -->
+	<select id="count" resultType="int">
+		SELECT COUNT(SEQ) FROM BOARD
+	</select>
+	
+	<!-- 게시물 목록 + 페이징 -->
+	<select id="listPage" parameterType="hashMap" resultType="com.board.domain.BoardDTO">
+		SELECT *
+		  FROM (
+		        SELECT ROW_NUMBER() OVER (ORDER BY SEQ) NUM, A.*
+		          FROM BOARD A ORDER BY SEQ
+		        ) 
+		 WHERE 1 = 1
+		 AND NUM BETWEEN #{displayPost} AND #{postNum}
+	</select>
+	
+	<!-- 게시물 목록 + 페이징 -->
+	<select id="listPageSearch" parameterType="hashMap" resultType="com.board.domain.BoardDTO">
+		SELECT *
+		  FROM (
+		        SELECT ROW_NUMBER() OVER (ORDER BY SEQ) NUM, A.*
+		          FROM BOARD A ORDER BY SEQ
+		        ) 
+		 <if test='searchType.equals("subject")'>
+		 	WHERE SUBJECT LIKE '%'|| #{keyword} || '%'
+		 </if>
+		 <if test='searchType.equals("content")'>
+		 	WHERE CONTENT LIKE '%'|| #{keyword} || '%'
+		 </if>		 
+		 <if test='searchType.equals("subject_content")'>
+		 	WHERE SUBJECT LIKE '%'|| #{keyword} || '%'
+		 	OR CONTENT LIKE '%'|| #{keyword} || '%'
+		 </if>
+		 <if test='searchType.equals("name")'>
+		 	WHERE NAME LIKE '%'|| #{keyword} || '%'
+		 </if>			 
+		 AND NUM BETWEEN #{displayPost} AND #{postNum}
+	</select>
+</mapper>
+
+	
+	<!-- 데이터 추가할때 사용 -->
+	<!-- INSERT INTO BOARD(SEQ, SUBJECT, CONTENT, NAME, REG_DATE)
+  SELECT BOARD_SEQ.NEXTVAL, A.SUBJECT, A.CONTENT, A.NAME, SYSDATE FROM BOARD A; -->
