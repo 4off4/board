@@ -39,12 +39,12 @@
 	<!-- 페이징 처리 -->
 	<div>
 		<c:if test="${page.prev}">
-			<span>[ <a href="/board/listPageSearch?seq=${page.startPageNum - 1}">이전</a> ] 
+			<span>[ <a href="/board/listPageSearch?seq=${page.startPageNum - 1}${page.searchTypeKeyword}">이전</a> ]</span>
 		</c:if>
 		<c:forEach begin="${page.startPageNum}" end="${page.endPageNum}" var="num">
 			<span>
 				<c:if test="${select != num}">
-					<a href="/board/listPageSearch?seq=${num}">${num}</a>
+					<a href="/board/listPageSearch?seq=${num}${page.searchTypeKeyword}">${num}</a>
 				</c:if> 
 				<c:if test="${select == num}">
 					<b>${num}</b>
@@ -53,21 +53,23 @@
 		</c:forEach>
 		
 		<c:if test="${page.next}">
-			<span>[ <a href="/board/listPageSearch?seq=${page.endPageNum + 1}">다음</a> ] </span>
+			<span>[ <a href="/board/listPageSearch?seq=${page.endPageNum + 1}${page.searchTypeKeyword}">다음</a> ]</span>
 		</c:if>
 		<br/>
 		
 		<!-- 검색 기능 -->
 		<div>
+		
 			<select name="searchType">
-				<option value="subject">제목</option>
-				<option value="content">내용</option>
-				<option value="subject_content">제목+내용</option>
-				<option value="name">작성자</option>
+				<option value="subject" <c:if test="${page.searchType eq 'subject'}">selected</c:if>>제목</option>
+				<option value="content" <c:if test="${page.searchType eq 'content'}">selected</c:if>>내용</option>
+				<option value="subject_content" <c:if test="${page.searchType eq 'subject_content'}">selected</c:if>>제목+내용</option>
+				<option value="name" <c:if test="${page.searchType eq 'name'}">selected</c:if>>작성자</option>
 			</select>
 			
-			<input type="text" name="keyword" />
+			<input type="text" name="keyword" value="${page.keyword}"/>
 			<button type="button" id="searchBtn">검색</button>
+			<p>${page.count}</p>
 		</div>
 	</div>
 	<script>

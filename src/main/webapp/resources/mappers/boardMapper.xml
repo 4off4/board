@@ -85,6 +85,24 @@
 		 </if>			 
 		 AND NUM BETWEEN #{displayPost} AND #{postNum}
 	</select>
+	
+	<!-- 게시물 총 갯수 + 검색 적용 -->
+	<select id="searchCount" parameterType="hashMap" resultType="int">
+		SELECT COUNT(SEQ) FROM BOARD 
+		<if test='searchType.equals("subject")'>
+			WHERE SUBJECT LIKE '%'|| #{keyword} || '%'
+		</if>
+		<if test='searchType.equals("content")'>
+			WHERE CONTENT LIKE '%'|| #{keyword} || '%'
+		</if>		 
+		<if test='searchType.equals("subject_content")'>
+			WHERE SUBJECT LIKE '%'|| #{keyword} || '%'
+			OR CONTENT LIKE '%'|| #{keyword} || '%'
+		</if>
+		<if test='searchType.equals("name")'>
+			WHERE NAME LIKE '%'|| #{keyword} || '%'
+		</if>			 	  
+	</select>
 </mapper>
 
 	

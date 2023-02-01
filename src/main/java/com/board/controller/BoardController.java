@@ -164,13 +164,18 @@ public class BoardController {
 	// 게시물 목록 + 페이징 추가
 	@RequestMapping(value = "/listPageSearch", method = RequestMethod.GET)
 	public void getListPageSearch(Model model, @RequestParam("seq") int num, 
-			@RequestParam(value = "searchType", required = false, defaultValue = "content") String searchType,
+			@RequestParam(value = "searchType", required = false, defaultValue = "subject") String searchType,
 			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword) throws Exception {
 
 		Page page = new Page();
 		
 		page.setNum(num);
-		page.setCount(service.count());  
+		page.setCount(service.searchCount(searchType, keyword));  
+		
+		// 검색 타입과 검색어
+		//page.setSearchTypeKeyword(searchType, keyword);
+		page.setSearchType(searchType);
+		page.setKeyword(keyword);
 
 		List<BoardDTO> list = null;
 		// list = service.listPage(page.getDisplayPost(), (page.getDisplayPost()+page.getPostNum()));
@@ -179,5 +184,11 @@ public class BoardController {
 		model.addAttribute("list", list);
 		model.addAttribute("page", page);
 		model.addAttribute("select", num);
+		
+//		model.addAttribute("searchType", searchType);
+//		model.addAttribute("keyword", keyword);
 	}	
+	
+	/* 2023.02.01 기준 */
+	// https://kuzuro.blogspot.com/2019/10/13-2.html 여기까지 했는데 오류가 나니까 오류 잡기! 
 }
